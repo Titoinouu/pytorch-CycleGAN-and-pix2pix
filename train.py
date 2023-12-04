@@ -22,7 +22,9 @@ import time
 from options.train_options import TrainOptions
 from data import create_dataset
 from models import create_model
-from util.visualizer import Visualizer
+from util.visualizer import Visualizer 
+from util.util import save_image
+import torch
 
 if __name__ == '__main__':
     opt = TrainOptions().parse()   # get training options
@@ -42,6 +44,8 @@ if __name__ == '__main__':
         visualizer.reset()              # reset the visualizer: make sure it saves the results to HTML at least once every epoch
         model.update_learning_rate()    # update learning rates in the beginning of every epoch.
         for i, data in enumerate(dataset):  # inner loop within one epoch
+            #print(f"data['A'].shape : {data['A'].shape}")
+            #print(f"data['B'].shape : {data['B'].shape}")
             iter_start_time = time.time()  # timer for computation per iteration
             if total_iters % opt.print_freq == 0:
                 t_data = iter_start_time - iter_data_time
@@ -52,10 +56,12 @@ if __name__ == '__main__':
             model.optimize_parameters()   # calculate loss functions, get gradients, update network weights
 
             if total_iters % opt.display_freq == 0:   # display images on visdom and save images to a HTML file
+                pass
+            """
                 save_result = total_iters % opt.update_html_freq == 0
                 model.compute_visuals()
                 visualizer.display_current_results(model.get_current_visuals(), epoch, save_result)
-
+            """
             if total_iters % opt.print_freq == 0:    # print training losses and save logging information to the disk
                 losses = model.get_current_losses()
                 t_comp = (time.time() - iter_start_time) / opt.batch_size
@@ -73,5 +79,21 @@ if __name__ == '__main__':
             print('saving the model at the end of epoch %d, iters %d' % (epoch, total_iters))
             model.save_networks('latest')
             model.save_networks(epoch)
-
+            
+        """
+        Changement par rapport à l'original'
+        
+        model.eval()
+        with torch.no_grad():
+            model.set_input(data)  # unpack data from data loader
+            model.test()           # run inference
+            visuals = model.get_current_visuals()  # get image results
+            img_path = model.get_image_paths()
+            img_path = 
+            util.save_image(im, save_path, aspect_ratio=aspect_ratio)
+        
+        model.train()
+        """
+        
+        
         print('End of epoch %d / %d \t Time Taken: %d sec' % (epoch, opt.n_epochs + opt.n_epochs_decay, time.time() - epoch_start_time))

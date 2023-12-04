@@ -1,0 +1,1 @@
+python train.py --dataroot ./datasets/boy2girl --name boy2girl_cyclegan --model cycle_gan --input_nc 20 --output_nc 20 --num_threads 8 --n_epochs 300 --continue_train --epoch 80 --epoch_count 81
